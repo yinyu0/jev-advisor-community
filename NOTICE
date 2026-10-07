@@ -1,0 +1,32 @@
+Jev Advisor Community — unofficial modified source distribution
+Modification date: 2026-10-07
+
+Based on jev-chat/jev-chat-windows at c6d3a10474ce1ff3b7f8f6402b3b5e0e58fad5f1.
+Copyright (c) 2026 rezoch340 and the jev-chat contributors.
+Portions Copyright (c) 2026 Finderchangchang and the jev-chat contributors.
+https://github.com/jev-chat/jev-chat-windows
+https://github.com/jev-chat/jev-chat-jarvis
+Original MIT license: LICENSES/Jev-MIT.txt
+Original upstream notice, preserved verbatim: LICENSES/Jev-NOTICE.original.txt
+
+Includes selected goutoujunshi reference documents.
+Copyright (c) 2026 powerycy.
+https://github.com/shengjidaguai-china/goutoujunshi
+Original MIT license: LICENSES/Goutoujunshi-MIT.txt and resources/advisor/LICENSE
+
+The combined modified application is distributed under GNU GPL version 3 only.
+The original MIT grants for upstream portions remain intact. See LICENSE.
+Modified/new source files are identified in PROVENANCE.md and carry dated notices.
+No warranty, to the extent permitted by applicable law. See LICENSE for details.
+You may redistribute and modify under the applicable license terms.
+
+This is not an official release or an endorsement by the upstream authors,
+Tencent/WeChat, or any model provider. Names identify provenance/interoperability only.
+
+Dependencies are installed separately and retain their own licenses.
+The original upstream NOTICE describes the upstream project and its own binary
+releases; its MIT-only summary does not describe this modified combined application.
+Its commercial-license commentary is preserved as an upstream statement, not
+incorporated as an additional non-commercial restriction on the GPL text.
+The UI library README's commercial wording requires separate clarification for
+commercial plans. This publication does not claim commercial clearance.
