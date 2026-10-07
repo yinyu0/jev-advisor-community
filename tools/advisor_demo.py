@@ -72,4 +72,3 @@ if '--smoke' in sys.argv:
     print('UI smoke passed: overlay, candidates, preview, explicit confirmation')
 else:
     ov.run()
-
