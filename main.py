@@ -1,6 +1,6 @@
+# Modified/added 2026-10-08 for this unofficial GPL-3.0-only application.
+# Upstream MIT notices are preserved in LICENSES/.
 # -*- coding: utf-8 -*-
-# Modified/added 2026-10-07 for this unofficial GPL-3.0-only application.
-# Upstream MIT portions retain their notices in LICENSES/Jev-MIT.txt.
 """父进程：只管界面。截图 + OCR 在 app/worker.py 的子进程里跑，队列里收新消息 →
 冒出新的对方消息才调 engine → 悬浮窗给 3 条候选 → 人点「填入」。发送永远手动。静默期零调用。
 上下文、结果、聊天记录都按会话名（子进程 OCR 头部标题得来）分开存，切会话不串味。
@@ -25,8 +25,22 @@ from core.engine import analyze
 from app.i18n import T
 from app.advisor_state import AdvisorSessions
 from app.advisor_dialog import AdvisorDialog
+from app.advisor_store import ProfileStore, StoreError
 
 advisor_sessions = AdvisorSessions()
+screenshot_assistant = None
+
+
+def open_screenshot_assistant():
+    global screenshot_assistant
+    # A manual workflow must not start new automatic analyses in the legacy collector.
+    on_toggle_capture(False)
+    if screenshot_assistant is None:
+        from app.screenshot_assistant import ScreenshotAssistant
+        screenshot_assistant = ScreenshotAssistant(ov.win)
+    screenshot_assistant.show()
+    screenshot_assistant.raise_()
+    screenshot_assistant.activateWindow()
 
 def open_advisor():
     title = state['chat']
@@ -51,13 +65,26 @@ def open_advisor():
         start_analyze(title, msgs, deep=deep)
         return True
     def forget():
+        nonlocal revision
         advisor_sessions.forget(title)
+        unchanged = chat_of(title)['rev'] == revision
         chat_of(title)['rev'] += 1
+        if unchanged:
+            revision = chat_of(title)['rev']
         chat_of(title)['result'] = None
         ov.show_cached(None)
-        ov.set_status('军师已停用，临时背景已清除')
-    # Never prefill a nickname-associated profile without confirming identity anew.
-    dialog = AdvisorDialog(title, msgs, advisor_sessions.get(title) or {}, apply, forget)
+        ov.set_status('军师已停用，已保存的档案仍保留')
+    try:
+        store = ProfileStore()
+    except StoreError as exc:
+        from PySide6.QtWidgets import QMessageBox
+        QMessageBox.warning(ov.win, '无法读取军师档案', str(exc))
+        return
+    active = advisor_sessions.get(title)
+    # The OCR title offers a candidate only; a changed conversation requires confirmation.
+    link = (state.get('app') or 'wechat') + ':' + title
+    dialog = AdvisorDialog(title, msgs, active or {}, apply, forget, store=store,
+                           link=link, confirmed=bool(active))
     dialog.exec()
 
 # {会话名: {history, result, rev, target, senders}}：每个会话各自的上下文、上次结果和版本号，互不串味
@@ -342,6 +369,7 @@ if __name__ == "__main__":  # Windows 的 spawn 会让子进程重新执行本�
                  on_language_changed=on_language_changed,
                  result_of=lambda t: chats.get(t, {}).get("result"))
     ov.advisorButton.clicked.connect(open_advisor)
+    ov.screenshotButton.clicked.connect(open_screenshot_assistant)
     try:
         state["hwnd"], found = find_chat_hwnd()
         state["app"] = found.key

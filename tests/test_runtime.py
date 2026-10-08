@@ -1,5 +1,5 @@
-# Modified/added 2026-10-07 for this unofficial GPL-3.0-only application.
-# Upstream MIT portions retain their notices in LICENSES/Jev-MIT.txt.
+# Modified/added 2026-10-08 for this unofficial GPL-3.0-only application.
+# Upstream MIT notices are preserved in LICENSES/.
 """Desktop integration checks with fake UI/queues; never capture or call an API."""
 import queue
 import threading
@@ -30,6 +30,29 @@ class RuntimeTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             main.fill_reply('hello')
         fill.assert_not_called()
+
+    @patch('main.start_analyze')
+    @patch('main.AdvisorDialog')
+    @patch('main.ProfileStore')
+    def test_save_invalidation_still_allows_confirmed_generation(self, store, dialog, analyze):
+        main.chat_of('A')['history'].append(('her', '测试', None))
+        main.open_advisor()
+        apply, forget = dialog.call_args.args[3:5]
+        forget()
+        self.assertTrue(apply({'goal': '邀约'}, False))
+        analyze.assert_called_once()
+
+    @patch('main.start_analyze')
+    @patch('main.AdvisorDialog')
+    @patch('main.ProfileStore')
+    def test_save_does_not_bypass_changed_messages(self, store, dialog, analyze):
+        main.chat_of('A')['history'].append(('her', '测试', None))
+        main.open_advisor()
+        apply, forget = dialog.call_args.args[3:5]
+        main.chat_of('A')['rev'] += 1
+        forget()
+        self.assertFalse(apply({'goal': '邀约'}, False))
+        analyze.assert_not_called()
 
     @patch('main.fill')
     def test_paused_never_fills(self, fill):

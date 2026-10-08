@@ -1,5 +1,5 @@
-# Modified/added 2026-10-07 for this unofficial GPL-3.0-only application.
-# Upstream MIT portions retain their notices in LICENSES/Jev-MIT.txt.
+# Modified/added 2026-10-08 for this unofficial GPL-3.0-only application.
+# Upstream MIT notices are preserved in LICENSES/.
 """Ephemeral profiles; a new observed conversation requires confirmation."""
 from copy import deepcopy
 

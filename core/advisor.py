@@ -1,5 +1,5 @@
-# Modified/added 2026-10-07 for this unofficial GPL-3.0-only application.
-# Upstream MIT portions retain their notices in LICENSES/Jev-MIT.txt.
+# Modified/added 2026-10-08 for this unofficial GPL-3.0-only application.
+# Upstream MIT notices are preserved in LICENSES/.
 """Relationship strategy adapter. No persistence and no automatic sending."""
 import json
 from pathlib import Path
@@ -46,7 +46,9 @@ RANK_STYLE = '''军师模式排序：先看是否接住对方此刻的具体内�
 
 def payload(messages, profile, keep=10):
     return {'profile': {k: str(profile.get(k, ''))[:3000] for k in
-                        ('relationship', 'goal', 'background', 'boundaries')},
+                        ('relationship', 'goal', 'background', 'boundaries', 'experiences')} | {
+                        'personal': {k: str((profile.get('personal') or {}).get(k, ''))[:3000]
+                                     for k in ('name', 'background', 'boundaries')}},
             'messages': messages[-keep:]}
 
 def knowledge(goal):

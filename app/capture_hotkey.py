@@ -1,5 +1,5 @@
-# Modified/added 2026-10-07 for this unofficial GPL-3.0-only application.
-# Upstream MIT portions retain their notices in LICENSES/Jev-MIT.txt.
+# Modified/added 2026-10-08 for this unofficial GPL-3.0-only application.
+# Upstream MIT notices are preserved in LICENSES/.
 """Windows global capture shortcut, owned by the Qt GUI thread."""
 import ctypes
 from ctypes import wintypes
@@ -12,17 +12,20 @@ class CaptureHotkey(QAbstractNativeEventFilter):
     WM_HOTKEY = 0x0312
     MODIFIERS = 0x0002 | 0x0001 | 0x4000  # Ctrl + Alt + no auto-repeat
 
-    def __init__(self, app, callback, user32=None):
+    def __init__(self, app, callback, user32=None, *, key='J', ident=None):
         super().__init__()
         self.app = app
         self.callback = callback
         self.user32 = user32 if user32 is not None else ctypes.windll.user32
         self.registered = False
+        self.key = key
+        if ident is not None:
+            self.ID = ident
 
     def register(self):
         if self.registered:
             return True
-        self.registered = bool(self.user32.RegisterHotKey(None, self.ID, self.MODIFIERS, ord('J')))
+        self.registered = bool(self.user32.RegisterHotKey(None, self.ID, self.MODIFIERS, ord(self.key)))
         if self.registered:
             self.app.installNativeEventFilter(self)
             self.app.aboutToQuit.connect(self.close)
